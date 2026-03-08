@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const PAGE_SIZE = 6;
 
-  let allRoutes = DB.get('routeHistory') || [];
+  let allRoutes = getUserScopedValue('routeHistory', user) || [];
   let filteredRoutes = [];
   let currentPage = 1;
   let sortKey = 'date';
@@ -304,15 +304,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const hospitalMarker = L.marker([hospital.lat, hospital.lng]).addTo(detailMap);
     hospitalMarker.bindTooltip(hospital.name);
 
-    const midLat = (route.originLat + hospital.lat) / 2 + 0.005;
-    const midLng = (route.originLng + hospital.lng) / 2 + 0.008;
-
     const polyline = L.polyline(
-      [
-        [route.originLat, route.originLng],
-        [midLat, midLng],
-        [hospital.lat, hospital.lng]
-      ],
+      route.routeGeometry?.length
+        ? route.routeGeometry
+        : [
+            [route.originLat, route.originLng],
+            [hospital.lat, hospital.lng]
+          ],
       { color: '#f5a623', weight: 4, opacity: 0.85 }
     ).addTo(detailMap);
 

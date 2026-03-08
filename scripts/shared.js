@@ -46,6 +46,131 @@ function getCurrentUser() {
   return DB.get('currentUser');
 }
 
+const DEMO_EMAIL = 'demo@occo.ems';
+const DEMO_LOCATION = {
+  lat: 41.8827,
+  lng: -87.6233,
+  label: 'Demo mode: Chicago, IL'
+};
+
+function isDemoUser(user) {
+  return user?.email?.toLowerCase() === DEMO_EMAIL;
+}
+
+function getUserScopedKey(key, user = getCurrentUser()) {
+  const email = user?.email?.trim().toLowerCase();
+  if (!email) return key;
+
+  const safeEmail = email.replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  return `${key}_${safeEmail}`;
+}
+
+function getUserScopedValue(key, user = getCurrentUser()) {
+  return DB.get(getUserScopedKey(key, user));
+}
+
+function setUserScopedValue(key, value, user = getCurrentUser()) {
+  DB.set(getUserScopedKey(key, user), value);
+  return value;
+}
+
+function removeUserScopedValue(key, user = getCurrentUser()) {
+  const scopedKey = getUserScopedKey(key, user);
+  DB.remove(scopedKey);
+
+  // Remove the legacy global key as part of the migration path.
+  if (scopedKey !== key) {
+    DB.remove(key);
+  }
+}
+
+function getLastKnownLocation(user = getCurrentUser()) {
+  return getUserScopedValue('lastKnownLocation', user);
+}
+
+function saveLastKnownLocation(location, user = getCurrentUser()) {
+  return setUserScopedValue('lastKnownLocation', location, user);
+}
+
+async function reverseGeocodeLocation(lat, lng) {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`
+    );
+    const data = await response.json();
+    return data.display_name?.split(',').slice(0, 3).join(', ') || 'Current Location';
+  } catch (error) {
+    return `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  }
+}
+
+function resolveUserLocation(user = getCurrentUser(), options = {}) {
+  const storedLocation = getLastKnownLocation(user);
+  const {
+    preferLive = true,
+    enableHighAccuracy = true,
+    timeout = 10000,
+    maximumAge = 30000
+  } = options;
+
+  if (isDemoUser(user)) {
+    return Promise.resolve({
+      ...DEMO_LOCATION,
+      timestamp: Date.now(),
+      source: 'demo'
+    });
+  }
+
+  if (!preferLive && storedLocation?.lat && storedLocation?.lng) {
+    return Promise.resolve({
+      ...storedLocation,
+      source: 'stored'
+    });
+  }
+
+  if (!navigator.geolocation) {
+    return Promise.resolve(
+      storedLocation?.lat && storedLocation?.lng
+        ? { ...storedLocation, source: 'stored' }
+        : null
+    );
+  }
+
+  return new Promise((resolve) => {
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const label = await reverseGeocodeLocation(lat, lng);
+        const location = {
+          lat,
+          lng,
+          label,
+          timestamp: Date.now()
+        };
+
+        saveLastKnownLocation(location, user);
+        resolve({
+          ...location,
+          source: 'live'
+        });
+      },
+      () => {
+        resolve(
+          storedLocation?.lat && storedLocation?.lng
+            ? { ...storedLocation, source: 'stored' }
+            : null
+        );
+      },
+      {
+        enableHighAccuracy,
+        timeout,
+        maximumAge
+      }
+    );
+  });
+}
+
 // Checks if a user is logged in — redirects to auth if not.
 // Call this at the top of every app page.
 function requireAuth() {
@@ -141,7 +266,7 @@ function initLogout() {
 
   btn.addEventListener('click', () => {
     // clear active route from db but keep history
-    DB.remove('activeRoute');
+    removeUserScopedValue('activeRoute');
     DB.remove('currentUser');
     window.location.href = 'auth.html';
   });
@@ -250,6 +375,140 @@ function kmToMiles(km) { return (km * 0.621371).toFixed(1); }
 
 // Estimate travel time in minutes from distance (km) assuming 40 km/h avg in city
 function estimateTravelMinutes(km) { return Math.round((km / 40) * 60); }
+
+function formatStepDistance(meters) {
+  if (!meters || meters < 30) return '';
+  if (meters >= 1609.344) return `${(meters / 1609.344).toFixed(1)} mi`;
+  if (meters >= 305) return `${(meters / 1609.344).toFixed(1)} mi`;
+  return `${Math.round(meters * 3.28084 / 10) * 10} ft`;
+}
+
+function getArrowForStep(step) {
+  const maneuver = step?.maneuver || {};
+  const modifier = maneuver.modifier || '';
+
+  if (maneuver.type === 'arrive') return '🏥';
+  if (modifier === 'left' || modifier === 'sharp left') return '↰';
+  if (modifier === 'slight left') return '↖';
+  if (modifier === 'right' || modifier === 'sharp right') return '↱';
+  if (modifier === 'slight right') return '↗';
+  if (modifier === 'uturn') return '↺';
+  return '↑';
+}
+
+function formatRouteInstruction(step, destName) {
+  const maneuver = step?.maneuver || {};
+  const roadName = step?.name || step?.ref || 'the route ahead';
+  const modifier = maneuver.modifier || '';
+  const cleanRoadName = roadName.trim();
+
+  if (maneuver.type === 'arrive') {
+    return `Arrive at ${destName}`;
+  }
+
+  if (maneuver.type === 'depart') {
+    return cleanRoadName === 'the route ahead'
+      ? 'Head to the route'
+      : `Head onto ${cleanRoadName}`;
+  }
+
+  if (maneuver.type === 'roundabout' || maneuver.type === 'roundabout turn') {
+    return cleanRoadName === 'the route ahead'
+      ? 'Enter the roundabout'
+      : `Enter the roundabout toward ${cleanRoadName}`;
+  }
+
+  if (maneuver.type === 'merge' || maneuver.type === 'on ramp') {
+    return cleanRoadName === 'the route ahead'
+      ? 'Merge onto the route'
+      : `Merge onto ${cleanRoadName}`;
+  }
+
+  if (maneuver.type === 'off ramp') {
+    return cleanRoadName === 'the route ahead'
+      ? 'Take the exit'
+      : `Take the exit toward ${cleanRoadName}`;
+  }
+
+  if (maneuver.type === 'fork') {
+    const forkDir = modifier ? ` ${modifier}` : '';
+    return cleanRoadName === 'the route ahead'
+      ? `Keep${forkDir}`.trim()
+      : `Keep${forkDir} onto ${cleanRoadName}`.trim();
+  }
+
+  if (maneuver.type === 'continue' || maneuver.type === 'new name') {
+    return cleanRoadName === 'the route ahead'
+      ? 'Continue straight'
+      : `Continue on ${cleanRoadName}`;
+  }
+
+  if (maneuver.type === 'end of road' || maneuver.type === 'turn') {
+    const turnDir = modifier ? ` ${modifier}` : '';
+    return cleanRoadName === 'the route ahead'
+      ? `Turn${turnDir}`.trim()
+      : `Turn${turnDir} onto ${cleanRoadName}`.trim();
+  }
+
+  return cleanRoadName === 'the route ahead'
+    ? 'Continue on the route'
+    : `Continue on ${cleanRoadName}`;
+}
+
+function buildNavigationStepsFromRoute(steps, destName) {
+  if (!Array.isArray(steps) || steps.length === 0) {
+    return getMockDirections(destName);
+  }
+
+  const navigationSteps = steps.map((step) => ({
+    arrow: getArrowForStep(step),
+    street: formatRouteInstruction(step, destName),
+    dist: formatStepDistance(step.distance),
+    distKm: Number(((step.distance || 0) / 1000).toFixed(2))
+  }));
+
+  const lastStep = navigationSteps[navigationSteps.length - 1];
+  if (!lastStep || lastStep.street !== `Arrive at ${destName}`) {
+    navigationSteps.push({
+      arrow: '🏥',
+      street: `Arrive at ${destName}`,
+      dist: '',
+      distKm: 0
+    });
+  }
+
+  return navigationSteps;
+}
+
+async function fetchRouteData(originLat, originLng, destLat, destLng, destName) {
+  const url =
+    `https://router.project-osrm.org/route/v1/driving/` +
+    `${originLng},${originLat};${destLng},${destLat}` +
+    `?overview=full&geometries=geojson&steps=true`;
+
+  const response = await fetch(url, {
+    headers: { Accept: 'application/json' }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Routing request failed with status ${response.status}`);
+  }
+
+  const data = await response.json();
+  const route = data.routes?.[0];
+  const leg = route?.legs?.[0];
+
+  if (!route || !leg || !route.geometry?.coordinates) {
+    throw new Error('Routing service returned no usable route');
+  }
+
+  return {
+    coordinates: route.geometry.coordinates.map(([lng, lat]) => [lat, lng]),
+    distanceKm: Number((route.distance / 1000).toFixed(2)),
+    durationMin: Math.max(1, Math.round(route.duration / 60)),
+    navigationSteps: buildNavigationStepsFromRoute(leg.steps || [], destName)
+  };
+}
 
 
 // ── Mock route data (for the navigation directions) ──────
@@ -386,9 +645,9 @@ const MOCK_ROUTE_HISTORY = [
 
 // Ensure history is seeded in DB if it doesn't exist yet
 function ensureHistorySeeded() {
-  const existing = DB.get('routeHistory');
+  const existing = getUserScopedValue('routeHistory');
   if (!existing) {
-    DB.set('routeHistory', MOCK_ROUTE_HISTORY);
+    setUserScopedValue('routeHistory', MOCK_ROUTE_HISTORY);
   }
 }
 

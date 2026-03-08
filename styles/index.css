@@ -245,29 +245,12 @@
 
 .marquee-strip {
   background: var(--amber);
-  overflow: hidden;
   padding: 0.5rem 0;
-  white-space: nowrap;
+  min-height: 1.5rem;
 }
 
 .marquee-track {
-  display: inline-block;
-  animation: marquee-scroll 25s linear infinite;
-}
-
-.marquee-track span {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: #0a0a0a;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0 var(--space-lg);
-}
-
-.marquee-track .sep {
-  padding: 0;
-  color: rgba(0,0,0,0.4);
+  display: none;
 }
 
 
