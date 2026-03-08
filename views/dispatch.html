@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EMS — New Dispatch</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/dispatch.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body class="app-body">
+
+  <!-- ========== SIDEBAR NAV ========== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-mark">OCCO</span>
+      <span class="logo-text"><span class="logo-ems">EMS</span></span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="sidebar-link">
+        <span class="sidebar-icon">⊞</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="dispatch.html" class="sidebar-link sidebar-link--active">
+        <span class="sidebar-icon">🚨</span>
+        <span>New Dispatch</span>
+      </a>
+      <a href="navigate.html" class="sidebar-link">
+        <span class="sidebar-icon">🧭</span>
+        <span>Navigate</span>
+      </a>
+      <a href="history.html" class="sidebar-link">
+        <span class="sidebar-icon">📋</span>
+        <span>Route History</span>
+      </a>
+    </nav>
+    <div class="sidebar-unit-info">
+      <div class="unit-badge">
+        <span class="unit-dot"></span>
+        <span id="sidebar-unit-name">Unit 14</span>
+      </div>
+      <span id="sidebar-dept">Chicago EMS</span>
+      <button class="sidebar-logout" id="logout-btn">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="topbar-breadcrumb">New Dispatch</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-time" id="topbar-time">--:--:--</div>
+        <div class="network-badge">
+          <span class="live-dot"></span>
+          <span id="network-units-count">47</span> units online
+        </div>
+      </div>
+    </header>
+
+    <div class="page-body dispatch-layout">
+
+      <!-- ===== LEFT: Input Panel ===== -->
+      <div class="dispatch-inputs">
+
+        <h2 class="dispatch-title">Incident Report</h2>
+        <p class="dispatch-subtitle">
+          Input the patient's condition. OCCO will calculate the optimal hospital and route.
+        </p>
+
+        <!-- Step 1: Injury Type -->
+        <div class="input-section">
+          <div class="input-section-label">
+            <span class="step-num">01</span>
+            Injury Type
+          </div>
+          <div class="injury-type-grid" id="injury-type-grid">
+            <!-- injury type chips populated by dispatch.js -->
+          </div>
+          <!-- fallback: free-text if type is not listed -->
+          <div class="form-group" style="margin-top: 0.75rem;">
+            <label for="injury-notes">Additional Notes <span class="optional">(optional)</span></label>
+            <textarea id="injury-notes" rows="2" placeholder=""></textarea>
+          </div>
+        </div>
+
+        <!-- Step 2: Severity -->
+        <div class="input-section">
+          <div class="input-section-label">
+            <span class="step-num">02</span>
+            Injury Severity
+          </div>
+
+          <!-- Severity scale buttons -->
+          <div class="severity-scale" id="severity-scale">
+            <button class="sev-btn" data-level="1">
+              <span class="sev-num">1</span>
+              <span class="sev-text">Minor</span>
+            </button>
+            <button class="sev-btn" data-level="2">
+              <span class="sev-num">2</span>
+              <span class="sev-text">Moderate</span>
+            </button>
+            <button class="sev-btn" data-level="3">
+              <span class="sev-num">3</span>
+              <span class="sev-text">Serious</span>
+            </button>
+            <button class="sev-btn" data-level="4">
+              <span class="sev-num">4</span>
+              <span class="sev-text">Critical</span>
+            </button>
+            <button class="sev-btn sev-btn--extreme" data-level="5">
+              <span class="sev-num">5</span>
+              <span class="sev-text">Trauma</span>
+            </button>
+          </div>
+
+          <!-- Dynamic guidance text that changes based on severity -->
+          <div class="severity-guidance" id="severity-guidance">
+            Select a severity level above.
+          </div>
+        </div>
+
+        <!-- Step 3: Number of patients -->
+        <div class="input-section">
+          <div class="input-section-label">
+            <span class="step-num">03</span>
+            Number of Patients
+          </div>
+          <div class="form-row form-row--half">
+            <div class="form-group">
+              <label for="patient-count">Count</label>
+              <input type="number" id="patient-count" min="1" max="20" value="1" />
+            </div>
+            <div class="form-group">
+              <label for="patient-age">Approx. Age</label>
+              <input type="number" id="patient-age" min="0" max="120" placeholder="e.g. 45" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Submit button -->
+        <button class="btn btn-emergency btn--full dispatch-submit" id="find-routes-btn">
+          Find Best Routes →
+        </button>
+
+        <!-- Loading state shown while routes are being calculated -->
+        <div class="route-calculating" id="route-calculating" aria-live="polite">
+          <div class="calc-spinner"></div>
+          <div class="calc-steps" id="calc-steps">
+            <span class="calc-step calc-step--active">📡 Detecting current location...</span>
+          </div>
+        </div>
+
+      </div><!-- /dispatch-inputs -->
+
+      <!-- ===== RIGHT: Map + Route Results ===== -->
+      <div class="dispatch-map-panel">
+
+        <!-- Map -->
+        <div class="dispatch-map-wrap">
+          <div id="dispatch-map" class="dispatch-map"></div>
+          <!-- Location pill overlay on top of the map -->
+          <div class="map-location-pill" id="map-location-pill">
+            <span class="location-dot"></span>
+            <span id="map-location-text">Acquiring location...</span>
+          </div>
+        </div>
+
+        <!-- Route results (hidden until routes are calculated) -->
+        <div class="route-results" id="route-results">
+          <div class="route-results-header">
+            <span class="route-results-title">Recommended Routes</span>
+            <span class="route-results-subtitle" id="route-results-subtitle"></span>
+          </div>
+
+          <!-- Route cards — generated by dispatch.js -->
+          <div class="route-cards" id="route-cards">
+          </div>
+
+          <!-- Hospital calling status -->
+          <div class="hospital-call-status" id="hospital-call-status">
+          </div>
+
+          <!-- The big GO button — appears once a route is selected -->
+          <div class="go-btn-wrap" id="go-btn-wrap" style="display:none;">
+            <a href="navigate.html" class="btn btn-go" id="go-btn">
+              GO!
+            </a>
+            <p class="go-hint">This will begin active turn-by-turn navigation.</p>
+          </div>
+
+        </div><!-- /route-results -->
+
+      </div><!-- /dispatch-map-panel -->
+
+    </div><!-- /page-body -->
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="../scripts/shared.js"></script>
+  <script src="../scripts/dispatch.js"></script>
+</body>
+</html>

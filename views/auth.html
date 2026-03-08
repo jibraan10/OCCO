@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EMS — Sign In</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/auth.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+</head>
+<body class="auth-body">
+
+  <!-- Left panel — branding / ambient -->
+  <div class="auth-left" aria-hidden="true">
+    <div class="auth-left-content">
+      <a href="index.html" class="auth-logo">
+        <span class="logo-mark">OCCO</span>
+        <span class="logo-text"><span class="logo-ems">EMS</span></span>
+      </a>
+
+      <blockquote class="auth-quote">
+        "The difference between a life saved and a life lost is often measured
+        in seconds. OCCO gives us those seconds back."
+        <cite>— Operations Director, Chicago EMS</cite>
+      </blockquote>
+
+      <!-- Simulated status feed in the background -->
+      <div class="auth-status-feed" aria-hidden="true">
+        <div class="feed-item feed-item--active">
+          <span class="feed-dot"></span>
+          Unit 14 → Memorial Hospital — 4.2 mi
+        </div>
+        <div class="feed-item">
+          <span class="feed-dot feed-dot--yellow"></span>
+          Unit 07 → St. Luke's — Rerouting...
+        </div>
+        <div class="feed-item">
+          <span class="feed-dot feed-dot--green"></span>
+          Unit 22 → Arrived — County General
+        </div>
+        <div class="feed-item">
+          <span class="feed-dot"></span>
+          Unit 03 → Northwestern ER — 7.8 mi
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right panel — actual form -->
+  <div class="auth-right">
+    <div class="auth-card">
+
+      <!-- Tab toggle: Login / Sign Up -->
+      <div class="auth-tabs">
+        <button class="auth-tab auth-tab--active" id="tab-login" data-tab="login">Sign In</button>
+        <button class="auth-tab" id="tab-signup" data-tab="signup">Create Account</button>
+      </div>
+
+      <!-- ===== LOGIN FORM ===== -->
+      <div class="auth-form-wrap" id="form-login">
+        <h1 class="auth-heading">Welcome Back</h1>
+        <p class="auth-subheading">Sign in to your OCCO dispatcher account.</p>
+
+        <div class="form-group">
+          <label for="login-email">Badge Email</label>
+          <input
+            type="email"
+            id="login-email"
+            placeholder="your@ems-dept.gov"
+            autocomplete="email"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <div class="input-with-toggle">
+            <input
+              type="password"
+              id="login-password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+            />
+            <button class="pw-toggle" data-target="login-password" aria-label="Show password">
+              👁
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row form-row--space-between">
+          <label class="checkbox-label">
+            <input type="checkbox" id="remember-me" />
+            Remember this device
+          </label>
+          <a href="#" class="form-link">Forgot password?</a>
+        </div>
+
+        <button class="btn btn-primary btn--full" id="login-submit">
+          Sign In
+        </button>
+
+        <p class="auth-switch">
+          New to OCCO?
+          <button class="inline-btn" id="go-signup">Create an account</button>
+        </p>
+      </div>
+
+      <!-- ===== SIGNUP FORM ===== -->
+      <div class="auth-form-wrap auth-form-wrap--hidden" id="form-signup">
+        <h1 class="auth-heading">Join OCCO</h1>
+        <p class="auth-subheading">Register your unit and department.</p>
+
+        <div class="form-row form-row--half">
+          <div class="form-group">
+            <label for="signup-first">First Name</label>
+            <input type="text" id="signup-first" placeholder="James" autocomplete="given-name" />
+          </div>
+          <div class="form-group">
+            <label for="signup-last">Last Name</label>
+            <input type="text" id="signup-last" placeholder="Carter" autocomplete="family-name" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-email">Department Email</label>
+          <input type="email" id="signup-email" placeholder="jcarter@ems.chicago.gov" autocomplete="email" />
+        </div>
+
+        <div class="form-group">
+          <label for="signup-badge">Badge / Unit Number</label>
+          <input type="text" id="signup-badge" placeholder="Unit 14" />
+        </div>
+
+        <div class="form-group">
+          <label for="signup-dept">Department / City</label>
+          <input type="text" id="signup-dept" placeholder="Chicago Fire Department EMS" />
+        </div>
+
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <div class="input-with-toggle">
+            <input
+              type="password"
+              id="signup-password"
+              placeholder="Min 8 characters"
+              autocomplete="new-password"
+            />
+            <button class="pw-toggle" data-target="signup-password" aria-label="Show password">👁</button>
+          </div>
+          <!-- password strength bar -->
+          <div class="pw-strength" id="pw-strength">
+            <div class="pw-strength-bar" id="pw-strength-bar"></div>
+          </div>
+          <span class="pw-strength-label" id="pw-strength-label"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="signup-confirm">Confirm Password</label>
+          <input
+            type="password"
+            id="signup-confirm"
+            placeholder="Repeat password"
+            autocomplete="new-password"
+          />
+        </div>
+
+        <div class="form-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="terms-agree" />
+            I agree to the <a href="#" class="form-link">Terms of Use</a> and
+            <a href="#" class="form-link">EMS Data Policy</a>
+          </label>
+        </div>
+
+        <button class="btn btn-primary btn--full" id="signup-submit">
+          Create Account
+        </button>
+
+        <p class="auth-switch">
+          Already have an account?
+          <button class="inline-btn" id="go-login">Sign in</button>
+        </p>
+      </div>
+
+      <!-- Error / success message area -->
+      <div class="auth-message" id="auth-message" aria-live="polite"></div>
+
+    </div>
+  </div>
+
+  <script src="../scripts/auth.js"></script>
+</body>
+</html>

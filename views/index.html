@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OCCO - Optimized Critical Care Orchestrator</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/index.css" />
+  <!-- Google Fonts: Bebas Neue for headings, JetBrains Mono for data, Lato for body -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ========== TOP NAV ========== -->
+  <nav class="top-nav">
+    <div class="nav-logo">
+      <span class="logo-mark">OCCO</span>
+      <span class="logo-text"><span class="logo-ems">EMS</span></span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#network">Network</a></li>
+      <li><a href="auth.html" class="nav-cta">Sign In</a></li>
+    </ul>
+    <!-- hamburger for mobile -->
+    <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ========== HERO ========== -->
+  <section class="hero">
+    <!-- animated grid background lives in CSS -->
+    <div class="hero-grid-bg" aria-hidden="true"></div>
+
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        LIVE NETWORK ACTIVE — 47 UNITS ONLINE
+      </div>
+
+      <h1 class="hero-headline">
+        Every Second<br />
+        <span class="headline-accent">Costs a Life.</span><br />
+        We Buy Them Back.
+      </h1>
+
+      <p class="hero-sub">
+        OCCO is an AI-powered ambulance routing platform that guides EMTs
+        to the right hospital <em>faster </em> by synchronizing traffic data, ER
+        congestion, injury severity, and every other unit in your fleet.
+      </p>
+
+      <div class="hero-actions">
+        <a href="auth.html" class="btn btn-primary">Get Access</a>
+        <a href="#how-it-works" class="btn btn-ghost">See How It Works ↓</a>
+      </div>
+    </div>
+
+    <!-- Live stat ticker on the right side -->
+    <div class="hero-stats" aria-label="Live platform statistics">
+      <div class="stat-item">
+        <span class="stat-label">AVG TIME SAVED</span>
+        <span class="stat-value">4.2<span class="stat-unit">min</span></span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-label">CITIES DEPLOYED</span>
+        <span class="stat-value">12</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-label">ROUTES OPTIMIZED</span>
+        <span class="stat-value">84K+</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-label">NETWORK UNITS</span>
+        <span class="stat-value" id="live-units">47</span>
+        <span class="live-indicator">● LIVE</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== MARQUEE STRIP ========== -->
+  <div class="marquee-strip" aria-hidden="true">
+    <div class="marquee-track">
+      <span>REAL-TIME ROUTING</span><span class="sep">◆</span>
+      <span>ER CONGESTION SYNC</span><span class="sep">◆</span>
+      <span>FLEET COORDINATION</span><span class="sep">◆</span>
+      <span>INJURY TRIAGE MATCHING</span><span class="sep">◆</span>
+      <span>LIVE TRAFFIC OVERLAY</span><span class="sep">◆</span>
+      <span>HOSPITAL PRE-ALERT</span><span class="sep">◆</span>
+      <!-- duplicate for seamless loop -->
+      <span>REAL-TIME ROUTING</span><span class="sep">◆</span>
+      <span>ER CONGESTION SYNC</span><span class="sep">◆</span>
+      <span>FLEET COORDINATION</span><span class="sep">◆</span>
+      <span>INJURY TRIAGE MATCHING</span><span class="sep">◆</span>
+      <span>LIVE TRAFFIC OVERLAY</span><span class="sep">◆</span>
+      <span>HOSPITAL PRE-ALERT</span><span class="sep">◆</span>
+    </div>
+  </div>
+
+  <!-- ========== HOW IT WORKS ========== -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="section-header">
+      <span class="section-tag">PROCESS</span>
+      <h2 class="section-title">Dispatch to Destination<br />in Four Steps</h2>
+    </div>
+
+    <div class="steps-grid">
+
+      <div class="step-card" data-step="01">
+        <div class="step-icon">🚨</div>
+        <h3>Incident Reported</h3>
+        <p>
+          The EMT inputs the injury type and severity directly into OCCO.
+          The severity of the injury determines where you go, from a local
+          urgent care to a hospital that provides specialized care 24/7.
+        </p>
+      </div>
+
+      <div class="step-card" data-step="02">
+        <div class="step-icon">🏥</div>
+        <h3>Hospitals Contacted</h3>
+        <p>
+          OCCO automonously calls any hospitals within range to ask for 
+          current ER wait times. These will be taken into account for 
+          route selection.
+        </p>
+      </div>
+
+      <div class="step-card" data-step="03">
+        <div class="step-icon">🗺️</div>
+        <h3>Route Calculated</h3>
+        <p>
+          The fastest routes are calculated based on ER times, hospital
+          congestion, live traffic data, and the position of other
+          OCCO units. The user selects the route that is recomended,
+          and the hospital that the user selects is notified, so they
+          can get ready for the patient arrival. 
+        </p>
+      </div>
+
+      <div class="step-card" data-step="04">
+        <div class="step-icon">🧭</div>
+        <h3>Navigate & Adapt</h3>
+        <p>
+          The driver follows the GPS directions that update in real time.
+          If a faster route opens up, OCCO prompts a reroute decision to
+          make sure the driver stays focused, not distracted by their phones.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========== FEATURES ========== -->
+  <section class="features" id="features">
+    <div class="section-header">
+      <span class="section-tag">CAPABILITIES</span>
+      <h2 class="section-title">Built for the Demands<br />of Real Emergency Response</h2>
+    </div>
+
+    <div class="features-layout">
+
+      <!-- large featured card -->
+      <div class="feature-card feature-card--large">
+        <div class="feature-card-icon">⚡</div>
+        <h3>Fleet-Wide Coordination</h3>
+        <p>
+          As more units join the OCCO network, the system gets smarter.
+          Ambulances share destination data in real time, preventing ER overloads
+          by distributing patients intelligently across all available hospitals.
+          The network effect is compounding — more units means better predictions
+          for every unit.
+        </p>
+        <div class="feature-metric">
+          <span class="metric-num">3.1×</span>
+          <span class="metric-label">better distribution with 10+ units active</span>
+        </div>
+      </div>
+
+      <!-- smaller cards -->
+      <div class="feature-card">
+        <div class="feature-card-icon">🚦</div>
+        <h3>Live Traffic Intelligence</h3>
+        <p>
+          Integrates with open mapping APIs for real-time congestion data.
+          Routes are recalculated continuously — not just at dispatch.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-icon">📋</div>
+        <h3>Injury-Matched Facilities</h3>
+        <p>
+          Severity scoring ensures minor injuries go to closer, less burdened
+          clinics, freeing major trauma centers for critical cases.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-icon">📞</div>
+        <h3>Automated Hospital Pre-Alert</h3>
+        <p>
+          Hospitals receive the injury type and ETA before the ambulance arrives
+          so staff can prepare the appropriate care environment in advance.
+        </p>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-icon">📊</div>
+        <h3>Route History & Analytics</h3>
+        <p>
+          Every route is logged. City administrators get actionable data on
+          response times, hospital usage, and network performance.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========== NETWORK SECTION ========== -->
+  <section class="network-section" id="network">
+    <div class="network-inner">
+      <div class="network-text">
+        <span class="section-tag">NETWORK EFFECT</span>
+        <h2 class="section-title">The More Units, The Smarter It Gets</h2>
+        <p>
+          OCCO isn't just navigation — it's a shared intelligence layer for your
+          entire fleet. When every ambulance shares its destination in real time,
+          no hospital gets overwhelmed while the one next door sits empty.
+          Your city's ER capacity becomes fully utilized, not accidentally wasted.
+        </p>
+        <a href="auth.html" class="btn btn-primary">Join the Network</a>
+      </div>
+
+      <!-- animated network diagram (CSS/SVG) -->
+      <div class="network-diagram" aria-hidden="true">
+        <div class="network-node node-hospital" style="top:20%; left:60%">
+          <span>H1</span>
+          <div class="node-ring"></div>
+        </div>
+        <div class="network-node node-hospital" style="top:65%; left:75%">
+          <span>H2</span>
+          <div class="node-ring"></div>
+        </div>
+        <div class="network-node node-hospital" style="top:45%; left:35%">
+          <span>H3</span>
+          <div class="node-ring"></div>
+        </div>
+        <div class="network-node node-ambulance" style="top:55%; left:55%">🚑</div>
+        <div class="network-node node-ambulance" style="top:30%; left:45%">🚑</div>
+        <div class="network-node node-ambulance" style="top:75%; left:45%">🚑</div>
+        <svg class="network-lines" viewBox="0 0 400 300" preserveAspectRatio="none">
+          <line x1="220" y1="165" x2="240" y2="60" class="net-line" />
+          <line x1="180" y1="90"  x2="140" y2="135" class="net-line" />
+          <line x1="220" y1="225" x2="300" y2="195" class="net-line" />
+          <line x1="220" y1="165" x2="300" y2="60"  class="net-line net-line--dim" />
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CTA BANNER ========== -->
+  <section class="cta-banner">
+    <h2>Ready to Deploy OCCO in Your City?</h2>
+    <p>Trusted by municipal EMS directors. Built for real emergencies.</p>
+    <a href="auth.html" class="btn btn-primary btn--large">Request Access →</a>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="site-footer">
+    <div class="footer-logo">
+      <span class="logo-mark">OCCO</span>
+      <span class="logo-text"><span class="logo-ems">EMS</span></span>
+    </div>
+    <p class="footer-copy">© 2026 OCCO EMS Systems. Built for the cities that can't afford to wait.</p>
+    <nav class="footer-links">
+      <a href="auth.html">Login</a>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="dispatch.html">Dispatch</a>
+      <a href="history.html">History</a>
+    </nav>
+  </footer>
+
+  <script src="../scripts/index.js"></script>
+</body>
+</html>

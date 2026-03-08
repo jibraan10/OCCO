@@ -1,0 +1,541 @@
+/* =====================================================
+   DISPATCH.CSS — New Dispatch / route selection page
+   ===================================================== */
+
+
+/* Side-by-side layout: inputs left, map right */
+.dispatch-layout {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: var(--space-lg);
+  padding: var(--space-lg);
+  height: calc(100vh - 56px); /* full height minus topbar */
+  overflow: hidden;
+}
+
+
+/* =====================================================
+   LEFT: Input Panel
+   ===================================================== */
+
+.dispatch-inputs {
+  overflow-y: auto;
+  padding-right: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.dispatch-title {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  letter-spacing: 0.04em;
+}
+
+.dispatch-subtitle {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-top: calc(-1 * var(--space-sm));
+}
+
+.dispatch-inputs .form-group {
+  margin-bottom: 0;
+}
+
+.dispatch-inputs .form-group label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-xs);
+}
+
+.dispatch-inputs .form-group input,
+.dispatch-inputs .form-group textarea {
+  width: 100%;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.7rem 0.9rem;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
+}
+
+.dispatch-inputs .form-group input:focus,
+.dispatch-inputs .form-group textarea:focus {
+  background: var(--bg-hover);
+  border-color: var(--amber-dim);
+  box-shadow: 0 0 0 3px var(--amber-glow);
+}
+
+.dispatch-inputs .form-group input::placeholder,
+.dispatch-inputs .form-group textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.dispatch-inputs .form-group textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+
+/* --- Input sections with step numbers --- */
+.input-section {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+}
+
+.input-section-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-md);
+}
+
+.step-num {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  color: var(--amber);
+  line-height: 1;
+}
+
+
+/* --- Injury type chips grid --- */
+.injury-type-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.injury-chip {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+  white-space: nowrap;
+}
+
+.injury-chip:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-bright);
+  color: var(--text-primary);
+}
+
+.injury-chip--selected {
+  background: var(--amber-glow);
+  border-color: var(--amber-dim);
+  color: var(--amber);
+}
+
+.injury-chip-icon { font-size: 0.9rem; }
+
+
+/* --- Severity scale --- */
+.severity-scale {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.sev-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 0.6rem 0.3rem;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.sev-btn:hover { border-color: var(--border-bright); }
+
+.sev-num {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.sev-text {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* selected state per severity level */
+.sev-btn--selected-1 { background: rgba(61,214,140,0.1);  border-color: var(--green);  }
+.sev-btn--selected-1 .sev-num { color: var(--green); }
+
+.sev-btn--selected-2 { background: rgba(245,214,35,0.1);  border-color: var(--yellow); }
+.sev-btn--selected-2 .sev-num { color: var(--yellow); }
+
+.sev-btn--selected-3 { background: rgba(245,166,35,0.12); border-color: var(--amber);  }
+.sev-btn--selected-3 .sev-num { color: var(--amber); }
+
+.sev-btn--selected-4 { background: rgba(232,69,69,0.12);  border-color: var(--red);    }
+.sev-btn--selected-4 .sev-num { color: var(--red); }
+
+.sev-btn--extreme { border-color: var(--red-dim); }
+.sev-btn--selected-5 { background: var(--red); border-color: var(--red); }
+.sev-btn--selected-5 .sev-num,
+.sev-btn--selected-5 .sev-text { color: #fff; }
+
+
+/* severity guidance text that appears below the scale */
+.severity-guidance {
+  margin-top: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  min-height: 1.5em;
+  transition: color var(--transition);
+}
+
+
+/* --- Submit button --- */
+.dispatch-submit {
+  margin-top: auto;
+}
+
+
+/* --- Loading/calculating state --- */
+.route-calculating {
+  display: none;  /* shown by JS when calculating */
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.route-calculating.is-visible { display: flex; }
+
+.calc-spinner {
+  width: 18px; height: 18px;
+  border: 2px solid var(--border);
+  border-top-color: var(--amber);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+.calc-steps { display: flex; flex-direction: column; gap: 2px; }
+
+.calc-step { color: var(--text-muted); }
+.calc-step--active { color: var(--amber); }
+.calc-step--done   { color: var(--green); }
+
+
+/* =====================================================
+   RIGHT: Map panel
+   ===================================================== */
+
+.dispatch-map-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  overflow-y: auto;
+}
+
+.dispatch-map-wrap {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.dispatch-map {
+  height: 360px;
+  width: 100%;
+}
+
+/* pill overlay showing current address */
+.map-location-pill {
+  position: absolute;
+  bottom: var(--space-md);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: rgba(8, 12, 20, 0.85);
+  border: 1px solid var(--border-bright);
+  border-radius: 100px;
+  padding: 0.35rem 0.9rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-primary);
+  backdrop-filter: blur(8px);
+  white-space: nowrap;
+  z-index: 10;
+}
+
+.location-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--amber);
+  animation: blink 1.5s infinite;
+}
+
+
+/* =====================================================
+   ROUTE RESULTS
+   ===================================================== */
+
+.route-results {
+  display: none;  /* toggled visible by JS */
+  flex-direction: column;
+  gap: var(--space-md);
+  animation: fadeSlideUp 0.4s ease both;
+}
+
+.route-results.is-visible { display: flex; }
+
+.route-results-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.route-results-title {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.route-results-subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+
+/* --- Route cards --- */
+.route-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* Base card — dark, neutral, no badge visible yet */
+.route-card {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md) var(--space-lg);
+  padding-bottom: calc(var(--space-md) + 4px); /* room for the badge at bottom */
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition), transform var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.route-card:hover {
+  border-color: var(--border-bright);
+  transform: translateX(2px);
+}
+
+/* Non-best cards after ranking — slightly dimmed to contrast the winner */
+.route-card--not-best {
+  background: var(--bg-surface);
+  opacity: 0.75;
+}
+
+.route-card--not-best:hover {
+  opacity: 1;
+}
+
+/* Recommended / best card — amber highlight */
+.route-card--best {
+  background: rgba(245, 166, 35, 0.08);
+  border-color: var(--amber);
+  box-shadow: 0 0 20px rgba(245, 166, 35, 0.1);
+}
+
+/* Selected by user click */
+.route-card--selected {
+  border-color: var(--amber-bright);
+  background: rgba(245, 166, 35, 0.12);
+}
+
+/* ── RECOMMENDED badge — sits in the bottom-right corner ── */
+/* Hidden by default; only shows when route-card--best is applied */
+.recommended-badge {
+  display: none;
+  position: absolute;
+  bottom: var(--space-sm);
+  right: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #0a0a0a;
+  background: var(--amber);
+  padding: 3px 8px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+/* Show the badge only on the recommended card */
+.route-card--best .recommended-badge {
+  display: inline-block;
+}
+
+.route-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-sm);
+}
+
+.route-hospital-name {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  /* make sure the hospital name never overlaps the badge area */
+  padding-right: var(--space-sm);
+}
+
+.route-eta {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: var(--amber);
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.route-eta-unit {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.route-card-meta {
+  display: flex;
+  gap: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.route-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.route-meta-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.route-meta-val {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-primary);
+}
+
+.route-meta-val--good  { color: var(--green); }
+.route-meta-val--warn  { color: var(--yellow); }
+.route-meta-val--bad   { color: var(--red); }
+
+/* ── Calling / spinner state for the ER wait cell ── */
+.wait-calling {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--amber);
+}
+
+.wait-calling-icon {
+  font-size: 0.85rem;
+  animation: blink 1.2s infinite;
+}
+
+.wait-calling-text {
+  letter-spacing: 0.04em;
+  animation: blink 1.2s infinite;
+}
+
+/* Flash animation when the wait time resolves */
+.wait-resolved {
+  animation: waitFlash 0.6s ease both;
+}
+
+@keyframes waitFlash {
+  0%   { opacity: 0; transform: scale(1.15); }
+  60%  { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+
+/* hospital-call-status section removed —
+   calling state is now shown inline inside each route card's ER Wait cell */
+
+
+/* --- GO button --- */
+.go-btn-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) 0;
+}
+
+.go-hint {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 900px) {
+  .dispatch-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
+  }
+
+  .dispatch-inputs { overflow-y: visible; padding-right: 0; }
+  .dispatch-map { height: 280px; }
+}

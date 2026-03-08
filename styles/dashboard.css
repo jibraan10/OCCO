@@ -1,0 +1,388 @@
+/* =====================================================
+   DASHBOARD.CSS — EMT driver dashboard
+   ===================================================== */
+
+
+/* --- Page greeting --- */
+.dash-greeting {
+  margin-bottom: var(--space-xl);
+}
+
+.dash-greeting h1 {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+
+.dash-greeting p {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: var(--space-xs);
+  letter-spacing: 0.06em;
+}
+
+
+/* =====================================================
+   KPI CARDS ROW
+   ===================================================== */
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.kpi-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  transition: border-color var(--transition);
+}
+
+.kpi-card:hover { border-color: var(--border-bright); }
+
+/* the "active route" card has amber accent border when a route is live */
+.kpi-card--alert {
+  border-color: var(--amber-dim);
+  background: linear-gradient(135deg, var(--bg-surface), rgba(245,166,35,0.04));
+}
+
+.kpi-label {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.kpi-value {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.kpi-value--small {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--amber);
+}
+
+.kpi-unit {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-left: 3px;
+}
+
+.kpi-delta {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.kpi-delta--up { color: var(--green); }
+
+.kpi-action {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--amber);
+  margin-top: auto;
+}
+
+.kpi-action:hover { color: var(--amber-bright); }
+
+
+/* =====================================================
+   MIDDLE ROW: map + feed
+   ===================================================== */
+
+.dash-mid-row {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+/* map card stretches taller */
+.dash-card--map { padding: 0; overflow: hidden; }
+
+.fleet-map-container {
+  height: 360px;
+  width: 100%;
+  border-radius: var(--radius-lg);
+}
+
+/* we need to add the header back inside the map card */
+.dash-card--map .dash-card-header {
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-surface);
+  margin-bottom: 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+
+/* --- Activity feed --- */
+.dash-card--feed { overflow-y: auto; max-height: 432px; }
+
+.activity-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.activity-feed-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: 0.5rem var(--space-sm);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  animation: fadeSlideUp 0.3s ease both;
+}
+
+.feed-unit {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--amber);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.feed-action {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  flex: 1;
+  line-height: 1.4;
+}
+
+.feed-time {
+  font-family: var(--font-mono);
+  font-size: 0.63rem;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+
+.feed-status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.feed-status-dot--active  { background: var(--amber); animation: blink 2s infinite; }
+.feed-status-dot--arrived { background: var(--green); }
+.feed-status-dot--idle    { background: var(--text-muted); }
+
+
+/* =====================================================
+   BOTTOM ROW: ER table + recent routes
+   ===================================================== */
+
+.dash-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+/* --- ER Status Table --- */
+.er-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
+.er-table th {
+  text-align: left;
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.er-table td {
+  padding: 0.55rem 0.5rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  vertical-align: middle;
+}
+
+.er-table tr:last-child td { border-bottom: none; }
+.er-table tr:hover td { background: var(--bg-hover); }
+
+/* load bar inside ER table */
+.er-load-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.er-load-bar {
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.er-load-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.5s ease;
+}
+
+/* color tiers for ER load */
+.er-load-fill--low    { background: var(--green); }
+.er-load-fill--mid    { background: var(--yellow); }
+.er-load-fill--high   { background: var(--amber); }
+.er-load-fill--maxed  { background: var(--red); }
+
+.er-load-pct {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  min-width: 30px;
+  text-align: right;
+}
+
+/* inbound units badge in ER table */
+.inbound-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  color: var(--amber);
+  background: var(--amber-glow);
+  border: 1px solid rgba(245,166,35,0.2);
+  padding: 2px 6px;
+  border-radius: 100px;
+}
+
+.inbound-badge--none {
+  color: var(--text-muted);
+  background: none;
+  border-color: transparent;
+}
+
+
+/* --- Recent routes list --- */
+.recent-routes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.recent-route-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 0.6rem var(--space-sm);
+  border-radius: var(--radius-sm);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+  text-decoration: none;
+}
+
+.recent-route-item:hover {
+  border-color: var(--border-bright);
+  background: var(--bg-hover);
+}
+
+.rr-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.rr-info { flex: 1; }
+
+.rr-hospital {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.rr-injury {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.rr-meta {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.rr-time {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.rr-saved {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--green);
+}
+
+
+/* =====================================================
+   DISPATCH CTA at bottom of page
+   ===================================================== */
+
+.dispatch-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl) 0;
+  border-top: 1px solid var(--border);
+}
+
+.dispatch-cta p {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+
+@media (max-width: 1100px) {
+  .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .dash-mid-row { grid-template-columns: 1fr; }
+  .dash-card--feed { max-height: 260px; }
+}
+
+@media (max-width: 700px) {
+  .kpi-row { grid-template-columns: 1fr 1fr; }
+  .dash-bottom-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .kpi-row { grid-template-columns: 1fr; }
+}

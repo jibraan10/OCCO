@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EMS — Dashboard</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/dashboard.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <!-- Leaflet for the live mini-map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body class="app-body">
+
+  <!-- ========== SIDEBAR NAV ========== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-mark">OCCO</span>
+      <span class="logo-text"><span class="logo-ems">EMS</span></span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="sidebar-link sidebar-link--active">
+        <span class="sidebar-icon">⊞</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="dispatch.html" class="sidebar-link">
+        <span class="sidebar-icon">🚨</span>
+        <span>New Dispatch</span>
+      </a>
+      <a href="navigate.html" class="sidebar-link">
+        <span class="sidebar-icon">🧭</span>
+        <span>Navigate</span>
+      </a>
+      <a href="history.html" class="sidebar-link">
+        <span class="sidebar-icon">📋</span>
+        <span>Route History</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-unit-info">
+      <div class="unit-badge">
+        <span class="unit-dot"></span>
+        <span id="sidebar-unit-name">Unit 14</span>
+      </div>
+      <span id="sidebar-dept">Chicago EMS</span>
+      <button class="sidebar-logout" id="logout-btn">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="main-content">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="topbar-breadcrumb">Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-time" id="topbar-time">--:--:--</div>
+        <div class="network-badge">
+          <span class="live-dot"></span>
+          <span id="network-units-count">47</span> units online
+        </div>
+        <div class="topbar-avatar" id="topbar-avatar">JC</div>
+      </div>
+    </header>
+
+    <!-- Page body -->
+    <div class="page-body">
+
+      <!-- Greeting -->
+      <div class="dash-greeting">
+        <h1>Good evening, <span id="user-first-name">James</span>.</h1>
+        <p>Unit <span id="user-unit">14</span> — <span id="user-dept-name">Chicago Fire Department EMS</span></p>
+      </div>
+
+      <!-- KPI Cards row -->
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <span class="kpi-label">Routes Today</span>
+          <span class="kpi-value" id="kpi-routes-today">3</span>
+          <span class="kpi-delta kpi-delta--up">+1 vs avg</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Total Time Saved</span>
+          <span class="kpi-value" id="kpi-time-saved">12<span class="kpi-unit">min</span></span>
+          <span class="kpi-delta kpi-delta--up">↑ vs manual routing</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">Patients This Week</span>
+          <span class="kpi-value" id="kpi-patients">11</span>
+          <span class="kpi-delta">across 4 facilities</span>
+        </div>
+        <div class="kpi-card kpi-card--alert" id="kpi-active-route-card">
+          <span class="kpi-label">Active Route</span>
+          <span class="kpi-value kpi-value--small" id="kpi-active-dest">None</span>
+          <a href="navigate.html" class="kpi-action" id="kpi-nav-link">Resume →</a>
+        </div>
+      </div>
+
+      <!-- Middle row: live map + fleet feed -->
+      <div class="dash-mid-row">
+
+        <!-- Live fleet mini-map -->
+        <div class="dash-card dash-card--map">
+          <div class="dash-card-header">
+            <span class="dash-card-title">Fleet Map</span>
+            <span class="live-pill">● LIVE</span>
+          </div>
+          <div id="fleet-map" class="fleet-map-container"></div>
+        </div>
+
+        <!-- Active fleet feed -->
+        <div class="dash-card dash-card--feed">
+          <div class="dash-card-header">
+            <span class="dash-card-title">Network Activity</span>
+            <button class="card-btn" id="refresh-feed">↻ Refresh</button>
+          </div>
+          <ul class="activity-feed" id="activity-feed">
+            <!-- populated by dashboard.js -->
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Bottom row: hospital status + recent routes -->
+      <div class="dash-bottom-row">
+
+        <!-- Hospital ER Status -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <span class="dash-card-title">Nearby ER Status</span>
+            <span class="card-update-time" id="er-update-time">Updated just now</span>
+          </div>
+          <table class="er-table">
+            <thead>
+              <tr>
+                <th>Hospital</th>
+                <th>Wait</th>
+                <th>Load</th>
+                <th>Units Inbound</th>
+              </tr>
+            </thead>
+            <tbody id="er-table-body">
+              <!-- populated by dashboard.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Recent routes summary -->
+        <div class="dash-card">
+          <div class="dash-card-header">
+            <span class="dash-card-title">Recent Routes</span>
+            <a href="history.html" class="card-btn">View All →</a>
+          </div>
+          <ul class="recent-routes" id="recent-routes-list">
+            <!-- populated by dashboard.js -->
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Big dispatch button — always visible -->
+      <div class="dispatch-cta">
+        <a href="dispatch.html" class="btn btn-emergency">
+          🚨 &nbsp; NEW DISPATCH
+        </a>
+        <p>Start a new route for an active incident</p>
+      </div>
+
+    </div><!-- /page-body -->
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="../scripts/shared.js"></script>
+  <script src="../scripts/dashboard.js"></script>
+</body>
+</html>

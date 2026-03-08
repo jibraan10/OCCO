@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EMS — Navigating</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/navigate.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body class="nav-body">
+
+  <!-- ========== TOP HUD — direction card ========== -->
+  <div class="nav-hud-top" id="nav-hud-top">
+    <div class="nav-current-direction">
+
+      <!-- Turn arrow icon -->
+      <div class="turn-arrow-wrap" id="turn-arrow-wrap">
+        <span class="turn-arrow" id="turn-arrow">↑</span>
+      </div>
+
+      <!-- Instruction text -->
+      <div class="nav-direction-text">
+        <span class="nav-street" id="nav-street">Preparing route...</span>
+        <span class="nav-in" id="nav-in">--</span>
+      </div>
+
+      <!-- ETA block -->
+      <div class="nav-eta-block">
+        <span class="nav-eta-label">ETA</span>
+        <span class="nav-eta-value" id="nav-eta">--:--</span>
+      </div>
+    </div>
+
+    <!-- Reroute prompt (shown when a better route is found) -->
+    <div class="reroute-prompt" id="reroute-prompt" style="display:none;" role="alert">
+      <div class="reroute-prompt-inner">
+        <span class="reroute-icon">⚡</span>
+        <div class="reroute-text">
+          <strong>Faster route found!</strong>
+          <span id="reroute-details">Saves approx. 2 min via Wacker Dr.</span>
+        </div>
+        <div class="reroute-actions">
+          <button class="btn btn-reroute-yes" id="reroute-accept">Accept</button>
+          <button class="btn btn-reroute-no" id="reroute-decline">Stay</button>
+        </div>
+        <!-- auto-accept countdown -->
+        <span class="reroute-countdown" id="reroute-countdown">Auto in 10s</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== FULL-SCREEN MAP ========== -->
+  <div id="nav-map" class="nav-map"></div>
+
+  <!-- ========== BOTTOM HUD ========== -->
+  <div class="nav-hud-bottom">
+
+    <!-- Left: Upcoming steps list -->
+    <div class="nav-steps-panel">
+      <div class="nav-steps-title">Upcoming</div>
+      <ol class="nav-steps-list" id="nav-steps-list">
+        <!-- populated by navigate.js -->
+      </ol>
+    </div>
+
+    <!-- Center: Destination info -->
+    <div class="nav-dest-panel">
+      <span class="nav-dest-label">Destination</span>
+      <span class="nav-dest-name" id="nav-dest-name">Memorial Hospital</span>
+      <span class="nav-dest-address" id="nav-dest-address">251 E Huron St</span>
+
+      <div class="nav-dest-stats">
+        <div class="dest-stat">
+          <span class="dest-stat-val" id="dest-dist">--</span>
+          <span class="dest-stat-label">miles</span>
+        </div>
+        <div class="dest-stat-divider"></div>
+        <div class="dest-stat">
+          <span class="dest-stat-val" id="dest-time">--</span>
+          <span class="dest-stat-label">min</span>
+        </div>
+        <div class="dest-stat-divider"></div>
+        <div class="dest-stat">
+          <span class="dest-stat-val" id="dest-er-wait">--</span>
+          <span class="dest-stat-label">ER wait</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Alerts + hospital call status -->
+    <div class="nav-alerts-panel">
+      <div class="nav-alerts-title">Status</div>
+
+      <!-- Hospital alert call -->
+      <div class="nav-alert nav-alert--calling" id="hospital-call-card">
+        <span class="alert-icon">📞</span>
+        <div class="alert-text">
+          <strong id="nav-hospital-call-name">Memorial Hospital</strong>
+          <span id="nav-hospital-call-status">Contacting ER...</span>
+        </div>
+        <div class="alert-dot" id="hospital-call-dot"></div>
+      </div>
+
+      <!-- Traffic alert -->
+      <div class="nav-alert" id="traffic-alert-card" style="display:none;">
+        <span class="alert-icon">🚦</span>
+        <div class="alert-text">
+          <strong>Traffic ahead</strong>
+          <span id="traffic-alert-desc">Congestion on I-90</span>
+        </div>
+      </div>
+
+      <!-- Network alert -->
+      <div class="nav-alert nav-alert--network" id="network-alert-card">
+        <span class="alert-icon">🔗</span>
+        <div class="alert-text">
+          <strong>Fleet Update</strong>
+          <span id="network-alert-desc">2 units also heading to Memorial</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /nav-hud-bottom -->
+
+  <!-- ========== ARRIVED OVERLAY ========== -->
+  <div class="arrived-overlay" id="arrived-overlay" style="display:none;">
+    <div class="arrived-card">
+      <div class="arrived-icon">🏥</div>
+      <h2>Arrived</h2>
+      <p class="arrived-hospital" id="arrived-hospital-name">Memorial Hospital</p>
+      <p class="arrived-sub">ER has been pre-alerted. Patient info on file.</p>
+
+      <div class="arrived-stats">
+        <div class="arr-stat">
+          <span id="arr-time">8 min</span>
+          <label>Travel Time</label>
+        </div>
+        <div class="arr-stat">
+          <span id="arr-saved">2.1 min</span>
+          <label>Time Saved</label>
+        </div>
+      </div>
+
+      <div class="arrived-actions">
+        <a href="dashboard.html" class="btn btn-primary">Back to Dashboard</a>
+        <a href="dispatch.html" class="btn btn-ghost">New Dispatch</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== FLOATING controls (top-right corner) ========== -->
+  <div class="nav-float-controls">
+    <button class="float-btn" id="center-map-btn" title="Center on my location">📍</button>
+    <button class="float-btn" id="zoom-in-btn" title="Zoom in">+</button>
+    <button class="float-btn" id="zoom-out-btn" title="Zoom out">−</button>
+    <button class="float-btn float-btn--danger" id="end-route-btn" title="End route">✕</button>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="../scripts/shared.js"></script>
+  <script src="../scripts/navigate.js"></script>
+</body>
+</html>

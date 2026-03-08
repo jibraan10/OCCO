@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EMS — Route History</title>
+  <link rel="stylesheet" href="../styles/global.css" />
+  <link rel="stylesheet" href="../styles/history.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body class="app-body">
+
+  <!-- ========== SIDEBAR NAV ========== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-mark">OCCO</span>
+      <span class="logo-text"><span class="logo-ems">EMS</span></span>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="dashboard.html" class="sidebar-link">
+        <span class="sidebar-icon">⊞</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="dispatch.html" class="sidebar-link">
+        <span class="sidebar-icon">🚨</span>
+        <span>New Dispatch</span>
+      </a>
+      <a href="navigate.html" class="sidebar-link">
+        <span class="sidebar-icon">🧭</span>
+        <span>Navigate</span>
+      </a>
+      <a href="history.html" class="sidebar-link sidebar-link--active">
+        <span class="sidebar-icon">📋</span>
+        <span>Route History</span>
+      </a>
+    </nav>
+    <div class="sidebar-unit-info">
+      <div class="unit-badge">
+        <span class="unit-dot"></span>
+        <span id="sidebar-unit-name">Unit 14</span>
+      </div>
+      <span id="sidebar-dept">Chicago EMS</span>
+      <button class="sidebar-logout" id="logout-btn">Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- ========== MAIN CONTENT ========== -->
+  <main class="main-content">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">☰</button>
+        <div class="topbar-breadcrumb">Route History</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-time" id="topbar-time">--:--:--</div>
+        <div class="network-badge">
+          <span class="live-dot"></span>
+          <span id="network-units-count">47</span> units online
+        </div>
+      </div>
+    </header>
+
+    <div class="page-body">
+
+      <!-- Page header + summary stats -->
+      <div class="history-header">
+        <div class="history-title-block">
+          <h1>Route History</h1>
+          <p>All routes for <span id="history-unit-name">Unit 14</span></p>
+        </div>
+
+        <div class="history-summary-stats">
+          <div class="hist-stat">
+            <span class="hist-stat-val" id="hist-total-routes">0</span>
+            <span class="hist-stat-label">Total Routes</span>
+          </div>
+          <div class="hist-stat">
+            <span class="hist-stat-val" id="hist-total-time-saved">0 min</span>
+            <span class="hist-stat-label">Time Saved</span>
+          </div>
+          <div class="hist-stat">
+            <span class="hist-stat-val" id="hist-total-patients">0</span>
+            <span class="hist-stat-label">Patients Transported</span>
+          </div>
+          <div class="hist-stat">
+            <span class="hist-stat-val" id="hist-avg-route-time">--</span>
+            <span class="hist-stat-label">Avg Route Time</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter + search bar -->
+      <div class="history-controls">
+        <div class="history-search-wrap">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            id="history-search"
+            class="history-search"
+            placeholder="Search by hospital, injury type, date..."
+          />
+        </div>
+
+        <div class="history-filters">
+          <select id="filter-severity" class="history-select">
+            <option value="all">All Severities</option>
+            <option value="1">Minor</option>
+            <option value="2">Moderate</option>
+            <option value="3">Serious</option>
+            <option value="4">Critical</option>
+            <option value="5">Trauma</option>
+          </select>
+
+          <select id="filter-period" class="history-select">
+            <option value="all">All Time</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+          </select>
+
+          <button class="btn btn-ghost btn--small" id="export-btn">
+            ↓ Export CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Main content: table left, detail map right -->
+      <div class="history-layout">
+
+        <!-- Routes table -->
+        <div class="history-table-wrap">
+          <table class="history-table" id="history-table">
+            <thead>
+              <tr>
+                <th class="th-sortable" data-sort="date">Date <span class="sort-arrow">↕</span></th>
+                <th class="th-sortable" data-sort="injury">Injury</th>
+                <th class="th-sortable" data-sort="severity">Sev.</th>
+                <th class="th-sortable" data-sort="hospital">Hospital</th>
+                <th class="th-sortable" data-sort="duration">Time</th>
+                <th class="th-sortable" data-sort="saved">Saved</th>
+                <th>Detail</th>
+              </tr>
+            </thead>
+            <tbody id="history-table-body">
+              <!-- rows generated by history.js -->
+            </tbody>
+          </table>
+
+          <!-- Empty state -->
+          <div class="history-empty" id="history-empty" style="display:none;">
+            <span class="empty-icon">📋</span>
+            <p>No routes found matching your filters.</p>
+          </div>
+
+          <!-- Pagination -->
+          <div class="history-pagination" id="history-pagination">
+            <button class="page-btn" id="page-prev" disabled>← Prev</button>
+            <span class="page-info" id="page-info">Page 1 of 1</span>
+            <button class="page-btn" id="page-next">Next →</button>
+          </div>
+        </div>
+
+        <!-- Route detail side panel -->
+        <div class="history-detail-panel" id="history-detail-panel">
+          <div class="detail-placeholder" id="detail-placeholder">
+            <span>Select a route to see details</span>
+          </div>
+
+          <div class="detail-content" id="detail-content" style="display:none;">
+            <div class="detail-header">
+              <h3 id="detail-date">--</h3>
+              <span class="detail-severity-badge" id="detail-severity-badge">--</span>
+            </div>
+
+            <div class="detail-row">
+              <span class="detail-label">Injury</span>
+              <span class="detail-val" id="detail-injury">--</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Hospital</span>
+              <span class="detail-val" id="detail-hospital">--</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Patients</span>
+              <span class="detail-val" id="detail-patients">--</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Travel Time</span>
+              <span class="detail-val" id="detail-duration">--</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Time Saved</span>
+              <span class="detail-val highlight" id="detail-saved">--</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">ER Wait on Arrival</span>
+              <span class="detail-val" id="detail-er-wait">--</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Notes</span>
+              <span class="detail-val" id="detail-notes">--</span>
+            </div>
+
+            <!-- Small route replay map -->
+            <div class="detail-map-wrap">
+              <div id="detail-map" class="detail-map"></div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /history-layout -->
+    </div><!-- /page-body -->
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="../scripts/shared.js"></script>
+  <script src="../scripts/history.js"></script>
+</body>
+</html>
